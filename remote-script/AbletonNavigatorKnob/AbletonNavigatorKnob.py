@@ -39,15 +39,29 @@ class AbletonNavigatorKnob(ControlSurface):
         return value - 128 if value >= 64 else value
 
     def _on_scene_scroll(self, value):
-        self.log_message("NavKnob: scene scroll %d" % self._delta(value))
+        song = self.song()
+        scenes = list(song.scenes)
+        index = scenes.index(song.view.selected_scene)
+        target = max(0, min(len(scenes) - 1, index + self._delta(value)))
+        song.view.selected_scene = scenes[target]
 
     def _on_track_scroll(self, value):
-        self.log_message("NavKnob: track scroll %d" % self._delta(value))
+        song = self.song()
+        tracks = list(song.visible_tracks)
+        if song.view.selected_track in tracks:
+            index = tracks.index(song.view.selected_track)
+            target = max(0, min(len(tracks) - 1, index + self._delta(value)))
+        else:
+            # selection was on a return track or the master track
+            target = 0 if self._delta(value) > 0 else len(tracks) - 1
+        song.view.selected_track = tracks[target]
 
     def _on_scene_fire(self, value):
         if value:
-            self.log_message("NavKnob: scene fire")
+            self.song().view.selected_scene.fire()
 
     def _on_clip_fire(self, value):
         if value:
-            self.log_message("NavKnob: clip fire")
+            slot = self.song().view.highlighted_clip_slot
+            if slot is not None:
+                slot.fire()
