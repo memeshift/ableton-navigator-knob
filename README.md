@@ -25,7 +25,7 @@ The firmware handles the modifier; Live only sees four messages (channel 1):
 
 - `remote-script/AbletonNavigatorKnob/` — MIDI Remote Script, symlinked into
   `~/Music/Ableton/User Library/Remote Scripts/`
-- `firmware/` — CircuitPython code for the Raspberry Pi Pico (pending hardware)
+- `firmware/` — CircuitPython code for the Raspberry Pi Pico
 - `tools/` — virtual-MIDI test sender for developing without hardware
 
 ## Development loop
@@ -37,3 +37,15 @@ The firmware handles the modifier; Live only sees four messages (channel 1):
 
 Until the Pico arrives, MIDI input comes from the macOS IAC Driver bus via the
 sender in `tools/`.
+
+## Flashing the Pico
+
+1. Download the CircuitPython UF2 for "Raspberry Pi Pico" from circuitpython.org
+2. Hold the BOOTSEL button on the Pico while plugging in USB; it mounts as a
+   drive named RPI-RP2
+3. Drag the UF2 onto that drive; it reboots and remounts as CIRCUITPY
+4. Copy `firmware/code.py` to the root of CIRCUITPY (it must be named code.py)
+5. Wire per the comment at the top of `firmware/code.py`, then switch the
+   Navigator input in Live's MIDI settings from IAC Driver to the Pico
+
+No libraries needed on the board — the firmware uses only built-in modules.
