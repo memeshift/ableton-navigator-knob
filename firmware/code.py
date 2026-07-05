@@ -8,7 +8,6 @@ Wiring (KY-040 module -> Pico):
     +   -> 3V3      GND -> GND
 Modifier button: one leg -> GP5, other leg -> GND
 """
-import digitalio
 import rotaryio
 import usb_midi
 import board
