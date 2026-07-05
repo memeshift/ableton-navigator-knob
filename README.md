@@ -49,3 +49,43 @@ sender in `tools/`.
    Navigator input in Live's MIDI settings from IAC Driver to the Pico
 
 No libraries needed on the board — the firmware uses only built-in modules.
+
+## Hardware arrival day — full checklist
+
+Current status (2026-07-06): remote script and virtual-knob sender are tested
+and working against Live 12.4.2. Firmware is written but has never touched
+real hardware. Parts ordered from Berrybase (Pico H, KY-040 encoder module,
+breadboard, jumpers, buttons).
+
+1. Flash CircuitPython on the Pico (section above, steps 1-3)
+2. Copy `firmware/code.py` to the CIRCUITPY drive root
+3. Wire on the breadboard:
+   - KY-040: CLK -> GP2, DT -> GP3, SW -> GP4, + -> 3V3 (NOT 5V/VBUS), GND -> GND
+   - Modifier button: one leg -> GP5, other leg -> GND
+4. In Live: Settings > Link/Tempo/MIDI, set the Navigator control surface
+   Input from "IAC Driver (Bus 1)" to the Pico's MIDI port
+5. Test in order: turn (scene selection moves), click (scene fires),
+   hold modifier + turn (track selection moves), hold modifier + click
+   (selected clip fires)
+
+### Likely first-run fixes
+
+- **Scroll direction reversed** — swap the CLK and DT jumpers, or swap
+  GP2/GP3 in the IncrementalEncoder line
+- **Two/half steps per detent** — adjust `divisor=4` in code.py (try 2 or 1);
+  KY-040 clones vary
+- **Pico not showing in Live** — check the USB cable is data-capable; confirm
+  CIRCUITPY mounts and code.py is at its root; errors from code.py appear if
+  you connect to the serial console (e.g. `screen /dev/tty.usbmodem* 115200`)
+- **Script edits don't take effect** — Live only re-imports remote script
+  code at startup; toggling the control surface slot is NOT enough, fully
+  quit and relaunch Live
+
+### Repo/session facts worth knowing
+
+- The script Live loads is a symlink: `~/Music/Ableton/User Library/Remote
+  Scripts/Navigator` -> `remote-script/AbletonNavigatorKnob/` in this repo
+- Script log lines: `grep NavKnob ~/Library/Preferences/Ableton/Live\
+  12.4.2/Log.txt` (path tracks the installed Live version)
+- Virtual testing without hardware: `.venv/bin/python tools/send.py cw 3`
+  etc., with Navigator's input set to IAC Driver (Bus 1)
